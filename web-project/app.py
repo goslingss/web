@@ -7,7 +7,6 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
-# КОНФИГУРАЦИЯ
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mars_mission_ultra_secret_key_99'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cognitive_test.db'
@@ -21,7 +20,6 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# ДАННЫЕ ТЕСТА
 BIASES = {
     'confirmation': 'Склонность к подтверждению',
     'dunning_kruger': 'Эффект Даннинга-Крюгера',
@@ -221,7 +219,6 @@ QUESTIONS = [
 ]
 
 
-# МОДЕЛИ БАЗЫ ДАННЫХ
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
@@ -249,7 +246,6 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-# СОВРЕМЕННЫЙ ШАБЛОН С CSS И JS
 BASE_LAYOUT = """
 <!DOCTYPE html>
 <html lang="ru">
@@ -662,7 +658,7 @@ BASE_LAYOUT = """
 
     <footer class="bg-white py-4 mt-5" style="box-shadow: 0 -2px 20px rgba(0,0,0,0.05);">
         <div class="container text-center text-muted">
-            <p class="mb-0"><i class="fas fa-brain me-2"></i>CogniTest © 2024. Все права защищены.</p>
+            <p class="mb-0"><i class="fas fa-brain me-2"></i>CogniTest © 2026. Все права защищены.</p>
         </div>
     </footer>
 
@@ -677,7 +673,6 @@ def render_page(content_html, **kwargs):
     return render_template_string(full_template, **kwargs)
 
 
-# МАРШРУТЫ
 @app.route('/')
 def index():
     content = """
@@ -1105,7 +1100,6 @@ def delete_account():
         password = request.form.get('confirm_password')
         confirm = request.form.get('confirm_checkbox')
 
-        # Проверки
         if not confirm:
             flash('Подтвердите, что вы понимаете последствия', 'warning')
             return redirect(url_for('delete_account'))
@@ -1114,16 +1108,12 @@ def delete_account():
             flash('Неверный пароль', 'danger')
             return redirect(url_for('delete_account'))
 
-        # Логируем перед удалением
         app.logger.warning(f"Account deletion: user_id={current_user.id}, username={current_user.username}")
 
-        # Cascade delete: сначала связанные записи
         TestResult.query.filter_by(user_id=current_user.id).delete()
 
-        # Сохраняем данные для сообщения
         username = current_user.username
 
-        # Удаляем пользователя и выходим
         db.session.delete(current_user)
         db.session.commit()
         logout_user()
@@ -1131,7 +1121,6 @@ def delete_account():
         flash(f'Аккаунт "{username}" удалён. Все данные стёрты.', 'success')
         return redirect(url_for('index'))
 
-    # GET-запрос: показываем страницу подтверждения
     content = """
     <div class="container py-5">
         <div class="row justify-content-center">
